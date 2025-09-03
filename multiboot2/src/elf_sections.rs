@@ -311,6 +311,11 @@ impl ElfSection<'_> {
         self.flags().contains(ElfSectionFlags::ALLOCATED)
     }
 
+    /// Get the index into the string table for the section name.
+    pub fn get_name_index(&self) -> u32 {
+        self.get().name_index()
+    }
+
     fn get(&self) -> &dyn ElfSectionInner {
         match self.entry_size {
             40 => unsafe { &*(self.inner as *const ElfSectionInner32) },
@@ -319,7 +324,8 @@ impl ElfSection<'_> {
         }
     }
 
-    unsafe fn string_table(&self) -> *const u8 {
+    /// Get the address of the string table.
+    pub unsafe fn string_table(&self) -> *const u8 {
         match self.entry_size {
             40 => {
                 let ptr = self.string_section.cast::<ElfSectionInner32>();
